@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2>Fresh Flower Catalog</h2>
+        <p class="text-muted">Select an item and pay instantly using QR code payment.</p>
+    </div>
+    {% for product in products %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text text-success fs-4 fw-bold">${{ "%.2f"|format(product.price) }}</p>
+                <form action="/checkout/{{ product.id }}" method="POST">
+                    <button type="submit" class="btn btn-primary w-100">Buy Now & Pay with QR</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
