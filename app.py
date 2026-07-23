@@ -6,15 +6,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, OrderTransaction
  
 from seed import seed_users
- 
+
+from config import vars
+
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'super-secret-flower-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flowershop.db'
+app.config['SECRET_KEY'] = vars['SECRET_KEY']
+app.secret_key = vars['SECRET_KEY']
+
+app.config['SQLALCHEMY_DATABASE_URI'] = vars['SQLALCHEMY_DATABASE_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
- 
+
 db.init_app(app)
- 
-BANK_API_URL = os.getenv('BANK_API_URL', 'http://localhost:5001/api/bank/initiate-payment')
+
+BANK_API_URL = vars['BANK_API_URL']
+
  
 PRODUCTS = [
     {"id": 1, "name": "Rose Bouquet", "price": 25.00},
@@ -27,6 +32,23 @@ def seed_db(app):
     seed_users(app)
  
 # --- AUTHENTICATION ROUTES ---
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        hashed_pw = generate_password_hash(request.form['password'])
+        new_user = User(
+            username=request.form['username'],
+            password=hashed_pw,
+            first_name=request.form['first_name'],
+            last_name=request.form['last_name'],
+            acct_number=request.form['acct_number']  # Critical for Bank matching
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created! Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
  
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -135,7 +157,7 @@ def checkout():
                 "payer_acct_number": session['acct_number']
             }
             # Here Bank will receive payload and create the QR code on their end
-            # response = requests.post(BANK_API_URL, json=bank_payload)
+            # response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload)
         except Exception as e:
             print(f"Bank API Error: {e}")
  
@@ -203,35 +225,7 @@ if __name__ == '__main__':
         seed_db(app)
     app.run(host='0.0.0.0', port=5000, debug=True)
  
-from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
- 
-db = SQLAlchemy()
- 
-class User(db.Model):
-    __tablename__ = 'users'
- 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    acct_number = db.Column(db.String(50), unique=True, nullable=False)
- 
-    transactions = db.relationship('OrderTransaction', backref='user', lazy=True)
- 
- 
-class OrderTransaction(db.Model):
-    __tablename__ = 'order_transactions'
- 
-    id = db.Column(db.String(36), primary_key=True)
-    indiv_order_name = db.Column(db.Text, nullable=False)
-    indiv_order_amt = db.Column(db.Text, nullable=False)
-    total_amt = db.Column(db.Float, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(20), default='PENDING')
- 
-    acct_number = db.Column(db.String(50), db.ForeignKey('users.acct_number'), nullable=False)
+
  
  
  
