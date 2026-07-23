@@ -27,3 +27,4 @@ class OrderTransaction(db.Model):
     status = db.Column(db.String(20), default='PENDING')
 
     acct_number = db.Column(db.String(50), db.ForeignKey('users.acct_number'), nullable=False)
+

@@ -5,6 +5,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, OrderTransaction
 
+from seed import seed_users
+
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'super-secret-flower-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flowershop.db'
@@ -21,26 +23,10 @@ PRODUCTS = [
     {"id": 4, "name": "Sunflower Bundle", "price": 15.00},
 ]
 
+def seed_db(app):
+    seed_users(app)
 
 # --- AUTHENTICATION ROUTES ---
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        hashed_pw = generate_password_hash(request.form['password'])
-        new_user = User(
-            username=request.form['username'],
-            password=hashed_pw,
-            first_name=request.form['first_name'],
-            last_name=request.form['last_name'],
-            acct_number=request.form['acct_number']  # Critical for Bank matching
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Account created! Please log in.', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -214,4 +200,5 @@ def receipt(order_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        seed_db(app)
     app.run(host='0.0.0.0', port=5000, debug=True)
