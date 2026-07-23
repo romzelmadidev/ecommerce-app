@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 p-4 bg-white" id="receipt">
+            <div class="text-center mb-4">
+                <h3>🌸 BloomCart Flowers</h3>
+                <p class="text-muted mb-0">Official Purchase Receipt</p>
+            </div>
+            <hr>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <small class="text-muted">CUSTOMER</small><br>
+                    <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-muted">ORDER DETAILS</small><br>
+                    <strong>{{ order.id }}</strong><br>
+                    <small>{{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                </div>
+            </div>
+            <table class="table table-sm border-top mb-3">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th class="text-end">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-success">{{ order.status }}</span></td>
+                        <td class="text-end fw-bold text-success">${{ "%.2f"|format(order.total_amt) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center mt-4">
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">Print Receipt 🖨️</button>
+                <a href="/" class="btn btn-primary btn-sm ms-2">Back to Shop</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

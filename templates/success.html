@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card shadow border-0 p-5">
+            <div class="display-1 text-success mb-3">✅</div>
+            <h2>Payment Successful!</h2>
+            <p class="text-muted">Thank you for your purchase at BloomCart Flowers.</p>
+            <p>Order ID: <strong>{{ order.id }}</strong></p>
+            <hr>
+            <a href="/receipt/{{ order.id }}" class="btn btn-success btn-lg">View Receipt 📄</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

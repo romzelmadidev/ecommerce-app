@@ -6,19 +6,138 @@
     <title>BloomCart Flowers 🌸</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .navbar-brand { font-weight: bold; color: #d63384 !important; }
+        :root {
+            --pink-topbar: #f28b82;
+            --pink-accent: #f06292;
+            --pink-btn: #f06292;
+            --pink-btn-hover: #d81b60;
+            --bg-light: #faf7f7;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: #444444;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Top Announcement Bar */
+        .top-announcement-bar {
+            background-color: var(--pink-topbar);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px 0;
+        }
+
+        /* Navbar Styling */
+        .navbar-custom {
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0e6e6;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--pink-btn) !important;
+            letter-spacing: -0.5px;
+        }
+
+        /* Buttons Styling */
+        .btn-pink {
+            background-color: var(--pink-btn);
+            color: #ffffff;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-pink:hover {
+            background-color: var(--pink-btn-hover);
+            color: #ffffff;
+        }
+
+        .btn-outline-pink {
+            border: 1px solid var(--pink-btn);
+            color: var(--pink-btn);
+            font-weight: 600;
+        }
+
+        .btn-outline-pink:hover {
+            background-color: var(--pink-btn);
+            color: #ffffff;
+        }
+
+        /* Card Enhancements */
+        .product-card {
+            border: 1px solid #f0e6e6;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: #ffffff;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(240, 98, 146, 0.12) !important;
+        }
+
+        .badge-pink {
+            background-color: var(--pink-btn);
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+
+    <!-- Top Announcement Bar (Flowerstore reference style) -->
+    <div class="top-announcement-bar text-center">
+        🌸 Special Offer: Same Day Flower Delivery Available! | 100% Happiness Guaranteed
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom shadow-sm mb-4 sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="/">🌸 BloomCart Flowers</a>
-            <span class="navbar-text text-muted">Group 4 Demo</span>
+            <a class="navbar-brand fs-4" href="{{ url_for('catalog') }}">🌸 BloomCart Flowers</a>
+            <div class="d-flex align-items-center">
+                {% if session.get('user_id') %}
+                    <span class="me-3 text-muted small">
+                        Hi, <strong>{{ session.get('full_name') }}</strong>
+                    </span>
+
+                    <!-- Cart Button with Counter -->
+                    <a href="{{ url_for('view_cart') }}" class="btn btn-outline-pink btn-sm me-2 position-relative">
+                        🛒 Cart
+                        {% set cart_count = session.get('cart', {}).values()|sum %}
+                        {% if cart_count > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle badge-pink">
+                                {{ cart_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{{ url_for('logout') }}" class="btn btn-light text-muted btn-sm border">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-pink btn-sm me-2">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-pink btn-sm">Register</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
-    <div class="container">
+
+    <!-- Content Container -->
+    <div class="container pb-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

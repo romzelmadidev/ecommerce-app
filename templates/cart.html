@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Shopping Cart</h2>
+{% if items %}
+    <div class="card shadow-sm border-0 p-3 mb-3">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>${{ "%.2f"|format(item.price) }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>${{ "%.2f"|format(item.subtotal) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <h4>Total: <span class="text-success">${{ "%.2f"|format(total) }}</span></h4>
+            <a href="/checkout" class="btn btn-success btn-lg">Proceed to Checkout 💳</a>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info">Your cart is empty. <a href="/">Browse catalog</a></div>
+{% endif %}
+{% endblock %}

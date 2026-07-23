@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card shadow border-0 p-5">
+            <div class="spinner-border text-primary mx-auto mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+            <h4>Waiting for Bank Payment Confirmation...</h4>
+            <p class="text-muted">Order ID: <strong id="ord-id">{{ order_id }}</strong></p>
+            <div id="status-badge" class="alert alert-warning fw-bold fs-5 mb-3">
+                Status: PENDING
+            </div>
+
+            <p class="small text-muted mb-3">Please complete payment inside your Bank App using the QR code displayed there.</p>
+
+            <!-- 🧪 MOCK TEST BUTTON FOR FRONTEND TESTING -->
+            <div class="border-top pt-3 mt-3">
+                <p class="text-secondary small mb-2"><strong>Dev Testing Control:</strong></p>
+                <button onclick="simulateBankPayment()" class="btn btn-outline-success btn-sm">
+                    ⚡ Simulate Successful Bank Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const orderId = "{{ order_id }}";
+    const userAcct = "{{ session.get('acct_number') }}";
+
+    // Auto-poll status every 2 seconds
+    const pollInterval = setInterval(() => {
+        fetch(`/order/${orderId}/status`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "PAID") {
+                    clearInterval(pollInterval);
+                    window.location.href = `/success/${orderId}`;
+                } else if (data.status === "FAILED_MISMATCH") {
+                    clearInterval(pollInterval);
+                    alert("Payment Failed: Account mismatch!");
+                    window.location.href = "/";
+                }
+            });
+    }, 2000);
+
+    // Mock function to trigger the /callback/payment-status endpoint manually
+    function simulateBankPayment() {
+        fetch('/callback/payment-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id: orderId,
+                acct_number: userAcct
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log('Mock Callback Response:', data));
+    }
+</script>
+{% endblock %}

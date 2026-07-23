@@ -1,42 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-        <div class="card shadow border-0 p-4">
-            <h4>Checkout: {{ product_name }}</h4>
-            <p class="text-muted">Order ID: <strong>{{ order_id }}</strong></p>
-            <h3 class="text-success mb-3">${{ "%.2f"|format(amount) }}</h3>
-
-            <div class="mb-3">
-                <img src="{{ qr_image }}" alt="Payment QR Code" class="img-fluid border p-2 bg-white rounded">
-            </div>
-
-            <div id="status-badge" class="alert alert-warning fw-bold fs-5 mb-3">
-                Status: PENDING
-            </div>
-
-            <p class="small text-muted mb-2">Scan QR with banking app or click below to simulate:</p>
-            <a href="{{ bank_confirm_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                Simulate QR Scan (Open Bank Page)
-            </a>
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 p-4">
+            <h3>Checkout Order</h3>
+            <hr>
+            <p><strong>Account Number:</strong> {{ session.get('acct_number') }}</p>
+            <p><strong>Total Amount:</strong> <span class="text-success fs-4 fw-bold">${{ "%.2f"|format(total) }}</span></p>
+            <p class="text-muted small">
+                Clicking confirm will send order details to the Bank. The Bank system will issue the payment QR code.
+            </p>
+            <form action="/checkout" method="POST">
+                <button type="submit" class="btn btn-primary w-100 btn-lg">Confirm & Initiate Bank Payment</button>
+            </form>
         </div>
     </div>
 </div>
-
-<script>
-    // Auto-poll order status every 2 seconds
-    const orderId = "{{ order_id }}";
-    const pollInterval = setInterval(() => {
-        fetch(`/order/${orderId}/status`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "PAID") {
-                    const badge = document.getElementById("status-badge");
-                    badge.className = "alert alert-success fw-bold fs-5 mb-3";
-                    badge.innerText = "Status: PAID ✅";
-                    clearInterval(pollInterval);
-                }
-            });
-    }, 2000);
-</script>
 {% endblock %}
