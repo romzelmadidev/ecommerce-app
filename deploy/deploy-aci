@@ -1,0 +1,96 @@
+apiVersion: '2021-10-01'
+location: eastus
+name: qr-payment-test-group
+properties:
+  osType: Linux
+  imageRegistryCredentials:
+  - server: qrregistry.azurecr.io
+    username: qrregistry
+    password: registrykeyplaceholder
+  containers:
+  # 1. Banking App Container
+  - name: banking-app
+    properties:
+      image: qrregistry.azurecr.io/banking-app:latest
+      resources:
+        requests:
+          cpu: 1.0
+          memoryInGB: 1.5
+      ports:
+      - port: 5001
+      environmentVariables:
+      - name: DB_HOST
+        value: localhost
+      - name: DB_USER
+        value: root
+      - name: DB_PASSWORD
+        value: rootpassword
+      - name: DB_NAME
+        value: banking
+      - name: ECOMMERCE_CALLBACK_URL
+        value: http://localhost:5000/callback/payment-status
+      - name: SECRET_KEY
+        value: test_secret_key_123
+
+  # 2. Ecommerce Flower Shop App Container
+  - name: ecommerce-app
+    properties:
+      image: qrregistry.azurecr.io/ecommerce-app:latest
+      resources:
+        requests:
+          cpu: 1.0
+          memoryInGB: 1.5
+      ports:
+      - port: 5000
+      environmentVariables:
+      - name: DB_HOST
+        value: localhost
+      - name: DB_USER
+        value: root
+      - name: DB_PASSWORD
+        value: rootpassword
+      - name: DB_NAME
+        value: ecommerce
+      - name: BANK_API_URL
+        value: http://localhost:5001/api/bank/initiate-payment
+      - name: SECRET_KEY
+        value: super-secret-flower-key
+
+  # 3. Shared MySQL Database Container
+  - name: mysql
+    properties:
+      image: mysql:8.0
+      resources:
+        requests:
+          cpu: 1.0
+          memoryInGB: 2.0
+      ports:
+      - port: 3306
+      environmentVariables:
+      - name: MYSQL_ROOT_PASSWORD
+        value: rootpassword
+      - name: MYSQL_DATABASE
+        value: banking
+      volumeMounts:
+      - mountPath: /var/lib/mysql
+        name: mysql-data
+
+  # Public Networking Configuration
+  ipAddress:
+    type: Public
+    dnsNameLabel: qr-payment-test-group
+    ports:
+    - protocol: tcp
+      port: 80
+    - protocol: tcp
+      port: 5000
+    - protocol: tcp
+      port: 5001
+
+  # Shared Storage Volumes
+  volumes:
+  - name: mysql-data
+    azureFile:
+      shareName: mysql-share
+      storageAccountName: qrstorageaccount
+      storageAccountKey: storagekeyplaceholder
