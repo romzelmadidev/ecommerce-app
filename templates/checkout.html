@@ -6,7 +6,7 @@
             <h3>Checkout Order</h3>
             <hr>
             <p><strong>Account Number:</strong> {{ session.get('acct_number') }}</p>
-            <p><strong>Total Amount:</strong> <span class="text-success fs-4 fw-bold">${{ "%.2f"|format(total) }}</span></p>
+            <p><strong>Total Amount:</strong> <span class="text-success fs-4 fw-bold">₱{{ "%.2f"|format(total) }}</span></p>
             <p class="text-muted small">
                 Clicking confirm will send order details to the Bank. The Bank system will issue the payment QR code.
             </p>

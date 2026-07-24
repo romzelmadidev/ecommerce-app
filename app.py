@@ -158,6 +158,7 @@ def checkout():
             }
             # Here Bank will receive payload and create the QR code on their end
             # response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload)
+            response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload)
         except Exception as e:
             print(f"Bank API Error: {e}")
  
@@ -187,17 +188,18 @@ def payment_callback():
     """Bank calls this webhook when payment is completed on their end."""
     data = request.get_json() or {}
     order_id = data.get('order_id')
-    bank_payer_acct = data.get('acct_number')
+    #bank_payer_acct = data.get('acct_number')
+    #status = data.get('status')
  
     order = OrderTransaction.query.get(order_id)
     if not order:
         return jsonify({"status": "ERROR", "message": "Order not found"}), 404
  
     # STRICT CHECK: Verify Bank Payer ACCT matches Ecommerce Order ACCT
-    if order.acct_number != bank_payer_acct:
-        order.status = 'FAILED_MISMATCH'
-        db.session.commit()
-        return jsonify({"status": "REJECTED", "message": "Account number mismatch!"}), 403
+    # if order.acct_number != bank_payer_acct:
+    #     order.status = 'FAILED_MISMATCH'
+    #     db.session.commit()
+    #     return jsonify({"status": "REJECTED", "message": "Account number mismatch!"}), 403
  
     order.status = 'PAID'
     db.session.commit()

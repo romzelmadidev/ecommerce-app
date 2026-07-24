@@ -16,15 +16,15 @@
                 {% for item in items %}
                 <tr>
                     <td>{{ item.name }}</td>
-                    <td>${{ "%.2f"|format(item.price) }}</td>
+                    <td>₱{{ "%.2f"|format(item.price) }}</td>
                     <td>{{ item.qty }}</td>
-                    <td>${{ "%.2f"|format(item.subtotal) }}</td>
+                    <td>₱{{ "%.2f"|format(item.subtotal) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <h4>Total: <span class="text-success">${{ "%.2f"|format(total) }}</span></h4>
+            <h4>Total: <span class="text-success">₱{{ "%.2f"|format(total) }}</span></h4>
             <a href="/checkout" class="btn btn-success btn-lg">Proceed to Checkout 💳</a>
         </div>
     </div>
