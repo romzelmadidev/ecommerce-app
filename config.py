@@ -33,9 +33,6 @@ vars: Dict[str, Any] = {
     'DB_PORT': os.environ.get('DB_PORT', '3306'),
     'DB_NAME': os.environ.get('DB_NAME', 'flowershop'),
     'SECRET_KEY': os.environ.get('SECRET_KEY', 'super-secret-flower-key'),
-    'BANK_API_URL': os.environ.get(
-        'BANK_API_URL',
-        'http://localhost:5001/api'
-    ),
+    'BANK_API_URL': os.environ.get('BANK_API_URL', 'http://localhost:5001'),
     'SQLALCHEMY_DATABASE_URI': _build_db_uri(),
 }
