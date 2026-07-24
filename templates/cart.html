@@ -16,8 +16,7 @@
             {% for item in items %}
             <div class="d-flex align-items-center gap-3 p-3" style="border-bottom:1px solid var(--border);">
                 <div style="font-size:2.2rem; background:var(--rose-light); border-radius:12px; width:56px; height:56px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                    {% set emojis = ['🌹','🌷','🌸','🌻'] %}
-                    {{ emojis[loop.index0 % 4] }}
+                    {{ item.emoji if item.emoji else '💐' }}
                 </div>
                 <div class="flex-grow-1">
                     <div class="fw-bold" style="font-family:'Playfair Display',serif; color:var(--text-dark);">{{ item.name }}</div>

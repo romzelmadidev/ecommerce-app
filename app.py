@@ -22,10 +22,18 @@ BANK_API_URL = vars['BANK_API_URL']
 
  
 PRODUCTS = [
-    {"id": 1, "name": "Rose Bouquet", "price": 25.00},
-    {"id": 2, "name": "Tulip Arrangement", "price": 18.50},
-    {"id": 3, "name": "Orchid Pot", "price": 30.00},
-    {"id": 4, "name": "Sunflower Bundle", "price": 15.00},
+    {"id": 1,  "name": "Rose Bouquet",           "price": 25.00,  "emoji": "🌹", "tag": "BEST SELLER"},
+    {"id": 2,  "name": "Tulip Arrangement",       "price": 18.50,  "emoji": "🌷", "tag": "IN SEASON"},
+    {"id": 3,  "name": "Orchid Pot",              "price": 30.00,  "emoji": "🌸", "tag": "PREMIUM"},
+    {"id": 4,  "name": "Sunflower Bundle",        "price": 15.00,  "emoji": "🌻", "tag": "IN SEASON"},
+    {"id": 5,  "name": "Lavender Bunch",          "price": 12.00,  "emoji": "💜", "tag": "NEW"},
+    {"id": 6,  "name": "Mixed Wildflower Box",    "price": 22.00,  "emoji": "💐", "tag": "POPULAR"},
+    {"id": 7,  "name": "Peony Bouquet",           "price": 35.00,  "emoji": "🌺", "tag": "PREMIUM"},
+    {"id": 8,  "name": "Baby's Breath Wrap",      "price": 10.00,  "emoji": "🤍", "tag": "ADD-ON"},
+    {"id": 9,  "name": "Luxury Gift Wrap",        "price": 8.00,   "emoji": "🎁", "tag": "ADD-ON"},
+    {"id": 10, "name": "Greeting Card",           "price": 3.50,   "emoji": "💌", "tag": "ADD-ON"},
+    {"id": 11, "name": "Bloom & Candle Set",      "price": 45.00,  "emoji": "🕯️", "tag": "GIFT SET"},
+    {"id": 12, "name": "Dried Flower Wreath",     "price": 28.00,  "emoji": "🪻", "tag": "NEW"},
 ]
  
 def seed_db(app):
@@ -113,8 +121,7 @@ def view_cart():
             subtotal = prod['price'] * qty
             total += subtotal
             cart_items.append({**prod, 'qty': qty, 'subtotal': subtotal})
-    return render_template('cart.html', items=cart_items, total=total)
- 
+    return render_template('cart.html', items=cart_items, total=total) 
  
 # --- CHECKOUT & BANK INTEGRATION ---
  
