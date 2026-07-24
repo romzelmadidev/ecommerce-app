@@ -1,29 +1,21 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV APP_PORT=5000
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nginx && \
+    rm -f /etc/nginx/sites-enabled/default && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create working directory
 WORKDIR /app
 
-# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application source code
 COPY . .
 
-# Create a non-root user and change ownership of the application directory
-RUN addgroup --system bankgroup && adduser --system --ingroup bankgroup bankuser
-RUN chown -R bankuser:bankgroup /app
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Switch to the non-root user
-USER bankuser
+RUN chmod +x start.sh
 
-# Expose port
-EXPOSE 5000
+EXPOSE 80
 
-# Command to run the application using gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["./start.sh"]
