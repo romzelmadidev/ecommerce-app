@@ -1,36 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0 p-4">
-            <h3 class="mb-3">Create Account</h3>
+    <div class="col-md-5 col-sm-10">
+
+        <div class="text-center mb-4">
+            <p style="font-size:2.8rem; line-height:1;">🌷</p>
+            <h2 style="font-family:'Playfair Display',serif; color:var(--rose-deep);">Join BloomCart</h2>
+            <p style="color:var(--text-soft); font-size:0.9rem;">Create your account and start shopping</p>
+        </div>
+
+        <div class="bloom-card p-4">
             <form action="/register" method="POST">
+
                 <div class="mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" required>
+                    <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                 </div>
+
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label">First Name</label>
-                        <input type="text" name="first_name" class="form-control" required>
+                        <input type="text" name="first_name" class="form-control" placeholder="Jane" required>
                     </div>
                     <div class="col">
                         <label class="form-label">Last Name</label>
-                        <input type="text" name="last_name" class="form-control" required>
+                        <input type="text" name="last_name" class="form-control" placeholder="Doe" required>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Bank Account Number (ACCT_NUMBER)</label>
-                    <input type="text" name="acct_number" class="form-control" placeholder="e.g. ACC-12345" required>
-                    <div class="form-text">Must match your account number on the Bank App.</div>
+
+                <div class="mb-4">
+                    <label class="form-label">Bank Account Number</label>
+                    <input type="text" name="acct_number" class="form-control" placeholder="e.g. 10000001" required>
+                    <div style="font-size:0.75rem; color:var(--text-soft); margin-top:4px;">
+                        Must match your account number in the Bank App.
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Register</button>
+
+                <button type="submit" class="btn btn-bloom w-100 btn-lg">Create Account 🌸</button>
             </form>
+
+            <div class="petal-divider mt-4 mb-3" style="color:var(--border);">✿ ✿ ✿</div>
+
+            <p class="text-center mb-0" style="font-size:0.85rem; color:var(--text-soft);">
+                Already have an account?
+                <a href="{{ url_for('login') }}" style="color:var(--rose-deep); font-weight:700; text-decoration:none;">Sign in →</a>
+            </p>
         </div>
+
     </div>
 </div>
 {% endblock %}

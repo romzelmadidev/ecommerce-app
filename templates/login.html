@@ -1,21 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 p-4">
-            <h3 class="mb-3">Sign In</h3>
+    <div class="col-md-4 col-sm-10">
+
+        <div class="text-center mb-4">
+            <p style="font-size:2.8rem; line-height:1;">🌸</p>
+            <h2 style="font-family:'Playfair Display',serif; color:var(--rose-deep);">Welcome Back</h2>
+            <p style="color:var(--text-soft); font-size:0.9rem;">Sign in to your BloomCart account</p>
+        </div>
+
+        <div class="bloom-card p-4">
             <form action="/login" method="POST">
                 <div class="mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" required>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. john" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-4">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Log In</button>
+                <button type="submit" class="btn btn-bloom w-100 btn-lg">Sign In 🌷</button>
             </form>
+
+            <div class="petal-divider mt-4 mb-3" style="color:var(--border);">✿ ✿ ✿</div>
+
+            <p class="text-center mb-0" style="font-size:0.85rem; color:var(--text-soft);">
+                New here?
+                <a href="{{ url_for('register') }}" style="color:var(--rose-deep); font-weight:700; text-decoration:none;">Create an account →</a>
+            </p>
         </div>
+
     </div>
 </div>
 {% endblock %}

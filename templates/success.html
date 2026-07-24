@@ -1,14 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-        <div class="card shadow border-0 p-5">
-            <div class="display-1 text-success mb-3">✅</div>
-            <h2>Payment Successful!</h2>
-            <p class="text-muted">Thank you for your purchase at BloomCart Flowers.</p>
-            <p>Order ID: <strong>{{ order.id }}</strong></p>
-            <hr>
-            <a href="/receipt/{{ order.id }}" class="btn btn-success btn-lg">View Receipt 📄</a>
+    <div class="col-md-5 col-sm-10 text-center">
+        <div class="bloom-card p-5">
+
+            <div style="font-size:4rem; margin-bottom:1rem;">🌸</div>
+
+            <h2 style="font-family:'Playfair Display',serif; color:var(--rose-deep);">Thank You!</h2>
+            <p style="color:var(--text-soft); margin-bottom:1.5rem;">
+                Your flowers are on their way. We hope they bring a big smile! 💐
+            </p>
+
+            <div class="p-3 mb-4" style="background:var(--rose-light); border-radius:14px;">
+                <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.08em; color:var(--text-soft); text-transform:uppercase; margin-bottom:4px;">Order ID</div>
+                <div style="font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; color:var(--rose-deep);">{{ order.id }}</div>
+            </div>
+
+            <div class="petal-divider mb-4" style="color:var(--border);">✿ ✿ ✿</div>
+
+            <div class="d-flex flex-column gap-2">
+                <a href="/receipt/{{ order.id }}" class="btn btn-bloom btn-lg">View Receipt 📄</a>
+                <a href="{{ url_for('catalog') }}" class="btn btn-outline-bloom btn-sm">Shop More Flowers 🌷</a>
+            </div>
+
         </div>
     </div>
 </div>

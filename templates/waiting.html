@@ -1,42 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-        <div class="card shadow border-0 p-5">
+    <div class="col-md-5 col-sm-10 text-center">
 
-            <!-- Spinner — hidden once PAID -->
-            <div class="spinner-border text-primary mx-auto mb-3" style="width: 3rem; height: 3rem;" role="status" id="spinner"></div>
+        <div class="bloom-card p-5">
 
-            <h4>Scan to Pay</h4>
-            <p class="text-muted mb-1">Order ID: <strong>{{ order_id }}</strong></p>
+            <!-- Animated petal spinner -->
+            <div id="spinner-wrap" class="mb-3">
+                <div style="font-size:3rem; animation: spin 3s linear infinite; display:inline-block;">🌸</div>
+            </div>
+
+            <h3 style="font-family:'Playfair Display',serif; color:var(--rose-deep);">Scan to Pay</h3>
+            <p style="color:var(--text-soft); font-size:0.85rem;" class="mb-1">Order <strong style="color:var(--text-dark);">{{ order_id }}</strong></p>
 
             <!-- Status badge -->
-            <div id="status-badge" class="alert alert-warning fw-bold fs-6 mb-4">
-                Waiting for payment...
+            <div id="status-badge" class="mt-2 mb-4 py-2 px-4 d-inline-block"
+                 style="background:var(--blush); color:var(--rose-deep); border-radius:50px; font-weight:700; font-size:0.85rem; letter-spacing:0.04em;">
+                ⏳ Waiting for payment...
             </div>
 
             <!-- QR Code -->
             {% if qr_image_url %}
             <div class="mb-4">
-                <img src="{{ qr_image_url }}"
-                     alt="Payment QR Code"
-                     class="img-fluid border rounded p-2"
-                     style="max-width: 260px;">
-                <p class="small text-muted mt-2">Scan this QR code with your phone to open the payment page.</p>
+                <div class="p-3 d-inline-block" style="background:var(--rose-light); border-radius:16px;">
+                    <img src="{{ qr_image_url }}"
+                         alt="Payment QR Code"
+                         style="max-width:220px; border-radius:8px; display:block;">
+                </div>
+                <p class="mt-3 mb-0" style="font-size:0.8rem; color:var(--text-soft);">
+                    Open your camera app and scan to pay via the bank
+                </p>
             </div>
             {% else %}
-            <div class="alert alert-secondary mb-4">
-                QR code could not be loaded. Please try checking out again.
+            <div class="mb-4 p-3" style="background:var(--blush); border-radius:12px;">
+                <p class="mb-0" style="font-size:0.85rem; color:var(--rose-deep);">
+                    QR code could not be loaded. Please try again.
+                </p>
             </div>
             {% endif %}
 
-            <p class="small text-muted">This page updates automatically once your payment is confirmed.</p>
+            <p style="font-size:0.8rem; color:var(--text-soft);">
+                This page updates automatically once your payment is confirmed.
+            </p>
 
-            <!-- Dev Testing Control -->
-            <div class="border-top pt-3 mt-3">
-                <p class="text-secondary small mb-2"><strong>Dev Testing:</strong></p>
-                <button onclick="simulateBankPayment()" class="btn btn-outline-success btn-sm">
-                    ⚡ Simulate Successful Bank Payment
+            <!-- Dev Testing -->
+            <div class="mt-4 pt-3" style="border-top:1px solid var(--border);">
+                <p style="font-size:0.75rem; color:var(--text-soft); margin-bottom:8px;">Dev testing</p>
+                <button onclick="simulateBankPayment()" class="btn btn-sage btn-sm">
+                    ⚡ Simulate Payment
                 </button>
             </div>
 
@@ -44,34 +56,40 @@
     </div>
 </div>
 
+<style>
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+</style>
+
 <script>
     const orderId = "{{ order_id }}";
     const userAcct = "{{ session.get('acct_number', '') }}";
 
-    // Poll order status every 2 seconds
     const pollInterval = setInterval(() => {
         fetch(`/order/${orderId}/status`)
             .then(res => res.json())
             .then(data => {
                 if (data.status === "PAID") {
                     clearInterval(pollInterval);
-                    // Update UI to show success before redirecting
-                    document.getElementById('spinner').classList.add('d-none');
+                    document.getElementById('spinner-wrap').innerHTML = '<div style="font-size:3rem;">🌸</div>';
                     const badge = document.getElementById('status-badge');
-                    badge.className = 'alert alert-success fw-bold fs-6 mb-4';
+                    badge.style.background = 'var(--sage-light)';
+                    badge.style.color = '#2e6b31';
                     badge.textContent = '✅ Payment confirmed! Redirecting...';
                     setTimeout(() => { window.location.href = `/success/${orderId}`; }, 1500);
                 } else if (data.status === "FAILED_MISMATCH") {
                     clearInterval(pollInterval);
                     const badge = document.getElementById('status-badge');
-                    badge.className = 'alert alert-danger fw-bold fs-6 mb-4';
+                    badge.style.background = '#fdecea';
+                    badge.style.color = '#b71c1c';
                     badge.textContent = '❌ Payment failed: Account mismatch.';
                 }
             })
             .catch(err => console.error('Polling error:', err));
     }, 2000);
 
-    // Dev: simulate payment without phone
     function simulateBankPayment() {
         fetch('/callback/payment-status', {
             method: 'POST',
