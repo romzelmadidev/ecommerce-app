@@ -56,6 +56,7 @@ def login():
         user = User.query.filter_by(username=request.form['username']).first()
         if user and check_password_hash(user.password, request.form['password']):
             session['user_id'] = user.id
+            session['username'] = user.username
             session['acct_number'] = user.acct_number
             session['full_name'] = f"{user.first_name} {user.last_name}"
             return redirect(url_for('catalog'))
@@ -155,7 +156,8 @@ def checkout():
             bank_payload = {
                 "order_id": order_id,
                 "amount": total_amt,
-                "payer_acct_number": session['acct_number']
+                "payer_acct_number": session['acct_number'],
+                "payer_username": session['username']
             }
             response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload, timeout=5)
             if response.ok:
