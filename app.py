@@ -149,18 +149,22 @@ def checkout():
         db.session.add(new_order)
         db.session.commit()
  
-        # Request Bank API to generate QR Code for this ACCT_NUMBER
+        # Request Bank API to generate QR Code for this order
+        qr_image_url = None
         try:
             bank_payload = {
                 "order_id": order_id,
                 "amount": total_amt,
                 "payer_acct_number": session['acct_number']
             }
-            # Here Bank will receive payload and create the QR code on their end
-            # response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload)
-            response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload)
+            response = requests.post(BANK_API_URL + "/get-payment-link", json=bank_payload, timeout=5)
+            if response.ok:
+                qr_image_url = response.json().get('url')
         except Exception as e:
             print(f"Bank API Error: {e}")
+
+        # Store QR URL in session so waiting page can display it
+        session['qr_image_url'] = qr_image_url
  
         # Clear cart after creating order
         session.pop('cart', None)
@@ -172,7 +176,9 @@ def checkout():
 @app.route('/checkout/waiting/<order_id>')
 def checkout_waiting(order_id):
     """Waiting page that polls bank payment status."""
-    return render_template('waiting.html', order_id=order_id)
+    order = OrderTransaction.query.get_or_404(order_id)
+    qr_image_url = session.pop('qr_image_url', None)
+    return render_template('waiting.html', order_id=order_id, qr_image_url=qr_image_url)
  
 @app.route('/order/<order_id>/status')
 def order_status(order_id):

@@ -3,58 +3,83 @@
 <div class="row justify-content-center">
     <div class="col-md-6 text-center">
         <div class="card shadow border-0 p-5">
-            <div class="spinner-border text-primary mx-auto mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
-            <h4>Waiting for Bank Payment Confirmation...</h4>
-            <p class="text-muted">Order ID: <strong id="ord-id">{{ order_id }}</strong></p>
-            <div id="status-badge" class="alert alert-warning fw-bold fs-5 mb-3">
-                Status: PENDING
+
+            <!-- Spinner — hidden once PAID -->
+            <div class="spinner-border text-primary mx-auto mb-3" style="width: 3rem; height: 3rem;" role="status" id="spinner"></div>
+
+            <h4>Scan to Pay</h4>
+            <p class="text-muted mb-1">Order ID: <strong>{{ order_id }}</strong></p>
+
+            <!-- Status badge -->
+            <div id="status-badge" class="alert alert-warning fw-bold fs-6 mb-4">
+                Waiting for payment...
             </div>
 
-            <p class="small text-muted mb-3">Please complete payment inside your Bank App using the QR code displayed there.</p>
+            <!-- QR Code -->
+            {% if qr_image_url %}
+            <div class="mb-4">
+                <img src="{{ qr_image_url }}"
+                     alt="Payment QR Code"
+                     class="img-fluid border rounded p-2"
+                     style="max-width: 260px;">
+                <p class="small text-muted mt-2">Scan this QR code with your phone to open the payment page.</p>
+            </div>
+            {% else %}
+            <div class="alert alert-secondary mb-4">
+                QR code could not be loaded. Please try checking out again.
+            </div>
+            {% endif %}
 
-            <!-- 🧪 MOCK TEST BUTTON FOR FRONTEND TESTING -->
+            <p class="small text-muted">This page updates automatically once your payment is confirmed.</p>
+
+            <!-- Dev Testing Control -->
             <div class="border-top pt-3 mt-3">
-                <p class="text-secondary small mb-2"><strong>Dev Testing Control:</strong></p>
+                <p class="text-secondary small mb-2"><strong>Dev Testing:</strong></p>
                 <button onclick="simulateBankPayment()" class="btn btn-outline-success btn-sm">
                     ⚡ Simulate Successful Bank Payment
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
 <script>
     const orderId = "{{ order_id }}";
-    const userAcct = "{{ session.get('acct_number') }}";
+    const userAcct = "{{ session.get('acct_number', '') }}";
 
-    // Auto-poll status every 2 seconds
+    // Poll order status every 2 seconds
     const pollInterval = setInterval(() => {
         fetch(`/order/${orderId}/status`)
             .then(res => res.json())
             .then(data => {
                 if (data.status === "PAID") {
                     clearInterval(pollInterval);
-                    window.location.href = `/success/${orderId}`;
+                    // Update UI to show success before redirecting
+                    document.getElementById('spinner').classList.add('d-none');
+                    const badge = document.getElementById('status-badge');
+                    badge.className = 'alert alert-success fw-bold fs-6 mb-4';
+                    badge.textContent = '✅ Payment confirmed! Redirecting...';
+                    setTimeout(() => { window.location.href = `/success/${orderId}`; }, 1500);
                 } else if (data.status === "FAILED_MISMATCH") {
                     clearInterval(pollInterval);
-                    alert("Payment Failed: Account mismatch!");
-                    window.location.href = "/";
+                    const badge = document.getElementById('status-badge');
+                    badge.className = 'alert alert-danger fw-bold fs-6 mb-4';
+                    badge.textContent = '❌ Payment failed: Account mismatch.';
                 }
-            });
+            })
+            .catch(err => console.error('Polling error:', err));
     }, 2000);
 
-    // Mock function to trigger the /callback/payment-status endpoint manually
+    // Dev: simulate payment without phone
     function simulateBankPayment() {
         fetch('/callback/payment-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                order_id: orderId,
-                acct_number: userAcct
-            })
+            body: JSON.stringify({ order_id: orderId, acct_number: userAcct })
         })
         .then(res => res.json())
-        .then(data => console.log('Mock Callback Response:', data));
+        .then(data => console.log('Simulated callback:', data));
     }
 </script>
 {% endblock %}
